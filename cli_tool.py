@@ -1,53 +1,53 @@
 import sys
-
-def show_help():
-    print("Standard Student CLI Tool")
-    print("Usage: python cli_tool.py [command] [arguments]")
-    print("\nAvailable Commands:")
-    print("  help              Shows this help manual menu")
-    print("  greet [name]      Prints a clean text greeting for the specified name")
-    print("  square [number]   Calculates and returns the square of a given number")
+from db_connection import get_connection
 
 def main():
-    # sys.argv captures everything typed in the terminal command line string.
-    # sys.argv[0] is always the name of the file itself ('cli_tool.py')
     arguments = sys.argv[1:]
 
-    # If the user typed no commands, show the help manual
     if not arguments:
-        show_help()
+        print("Usage: python main.py [table_name]")
+        print("Example: python main.py students")
         return
 
-    # Extract the primary command word
-    command = arguments[0].lower()
+    target_table = arguments[0].lower()
 
-    if command == "help":
-        show_help()
+    conn = get_connection()
+    if conn is None:
+        return
 
-    elif command == "greet":
-        # Check if the user provided the required name argument
-        if len(arguments) < 2:
-            print("Error: The 'greet' command requires a name argument.")
-            print("Example: python cli_tool.py greet Rudra")
-        else:
-            name = arguments[1]
-            print(f"Hello, {name}! Your custom CLI pipeline is working perfectly.")
+    cursor = conn.cursor()
 
-    elif command == "square":
-        # Check if the user provided the required number argument
-        if len(arguments) < 2:
-            print("Error: The 'square' command requires a number argument.")
-            print("Example: python cli_tool.py square 5")
-        else:
-            try:
-                number = int(arguments[1])
-                print(f"The square of {number} is: {number * number}")
-            except ValueError:
-                print("Error: Please provide a valid integer value to square.")
+
+    if target_table == "companies":
+        print("Scanning Table: COMPANIES")
+        cursor.execute("SELECT * FROM companies;")
+        for row in cursor.fetchall():
+            print(row)
+
+    elif target_table == "students":
+        print("Scanning Table: STUDENTS")
+        cursor.execute("SELECT * FROM students;")
+        for row in cursor.fetchall():
+            print(row)
+
+    elif target_table == "jobs":
+        print("Scanning Table: JOBS")
+        cursor.execute("SELECT * FROM jobs;")
+        for row in cursor.fetchall():
+            print(row)
+
+    elif target_table == "applications":
+        print("Scanning Table: APPLICATIONS")
+        cursor.execute("SELECT * FROM applications;")
+        for row in cursor.fetchall():
+            print(row)
 
     else:
-        print(f"Unknown command instruction: '{command}'")
-        print("Type 'python cli_tool.py help' to view valid options.")
+        print(f"Error: Table '{target_table}' not exists.")
+
+    
+    cursor.close()
+    conn.close()
 
 if __name__ == "__main__":
     main()
